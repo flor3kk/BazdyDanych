@@ -1,0 +1,339 @@
+select count(distinct student_id), wynik, nazwa from zaliczenia z
+inner join przedmioty p on z.przedmiot_Id = p.przedmiot_id
+where p.przedmiot_id =3
+group by wynik,nazwa
+
+--1
+select DISTINCT s.imie, s.nazwisko, w.nazwisko from zaliczenia z inner join studenci s on z.student_id = s.student_id inner join wykladowcy w on z.wykladowca_id = w.wykladowca_id where w.wykladowca_id 
+NOT IN(SELECT wykladowca_id from wykladowcy where nazwisko||' '||imie like 'Bober Dariusz')
+
+--2
+SELECT Z.wynik, K.nazwa, DATE_PART('Year', data_zal) FROM zaliczenia Z INNER JOIN kierunki K on Z.kierunek_id = k.kierunek_id  
+WHERE DATE_PART('Year', data_zal) > 2020 AND Z.wynik LIKE 'N%';
+
+--3
+select DISTINCT w.nazwisko, w.imie, p.opis from zaliczenia z inner join wykladowcy w on z.wykladowca_id = w.wykladowca_id inner join przedmioty p on z.przedmiot_id = p.przedmiot_id 
+where p.opis like '%poczt%'
+
+--4
+select k.kierunek_id, z.wynik, S.nazwisko, P.nazwa FROM zaliczenia z inner join kierunki k on z.kierunek_id = k.kierunek_id INNER JOIN studenci S on z.student_id = s.student_id 
+INNER JOIN przedmioty p ON z.przedmiot_id = P.przedmiot_id WHERE s.nazwisko = 'Szafraniec' and k.kierunek_id = 2 and z.wynik LIKE 'Z%'
+
+--5
+SELECT  S.nazwisko, S.imie, W.IMIE||' '||W.nazwisko wykladowca, p.nazwa FROM zaliczenia Z INNER JOIN Studenci S on Z.student_id = S.student_id 
+INNER JOIN Wykladowcy W on z.wykladowca_id = W.wykladowca_id INNER JOIN przedmioty P on z.przedmiot_id = P.przedmiot_id WHERE w.imie = 'Mateusz'
+
+--6
+SELECT DISTINCT W.wykladowca_id, W.nazwisko||' '||W.imie wykladowcy, S.student_id, S.nazwisko, S.imie FROM wykladowcy W, zaliczenia Z, Studenci S where S.Student_id=z.student_id and W.wykladowca_id ='0001';
+
+--7
+SELECT DISTINCT S.nazwisko, S.imie, S.student_id, TO_CHAR(data_zal, 'Day'), P.nazwa FROM Zaliczenia Z INNER JOIN Studenci S on Z.student_id = S.student_id INNER JOIN przedmioty P on Z.przedmiot_id = P.przedmiot_id where s.student_id = '0000060';
+
+--8
+SELECT S.nazwisko, S.imie, P.nazwa, data_zal from Studenci S INNER JOIN zaliczenia Z on s.student_id = z.student_id INNER JOIN przedmioty P on Z.przedmiot_id = P.przedmiot_id WHERE 1=1 AND data_zal BETWEEN TO_DATE('20 April 2019', 'DD Month YYYY') AND TO_DATE('20 May 2020', 'DD Month YYYY');
+
+--9
+SELECT DISTINCT s.student_id, S.imie, S.nazwisko, P.nazwa, Z.wynik FROM studenci S INNER JOIN zaliczenia Z ON S.student_id = Z.student_id INNER JOIN przedmioty P on Z.przedmiot_id = P.przedmiot_id where S.student_id in('0500323', '0000061') and Z.wynik LIKE 'Z%' 
+
+--10
+select s.nazwisko, s.imie, s.student_id from studenci s where s.student_id not in(
+select s.student_id from zaliczenia z 
+inner join studenci s on z.student_id = s.student_id 
+inner join przedmioty p on z.przedmiot_id = p.przedmiot_id 
+where p.przedmiot_id = 7)
+
+--11
+select kierunek_id, nazwa from kierunki except
+select distinct k.kierunek_id, k.nazwa from zaliczenia z
+inner join kierunki k on z.kierunek_id  = k.kierunek_id
+
+--12
+select wykladowca_Id, nazwisko, imie from wykladowcy
+where nazwisko like 'B%'
+
+--13
+select p.przedmiot_id, p.nazwa, TO_CHAR(data_zal, 'YYYY Month') from zaliczenia z
+inner join przedmioty p on z.przedmiot_id = p.przedmiot_id
+where TO_CHAR(data_zal, 'YYYY Month') LIKE '2020 A%' AND p.przedmiot_id = 3
+
+--14
+select w.nazwisko, w.imie, w.wykladowca_id, count(*) from zaliczenia z 
+inner join wykladowcy w on z.wykladowca_id = w.wykladowca_id
+where w.wykladowca_Id = '0006' and z.wynik like 'Z%'
+group by w.wykladowca_id
+
+--15
+select min(data_zal) pierwsza, max(data_zal) ostatnia, k.kierunek_id, k.nazwa from zaliczenia z 
+inner join kierunki k on z.kierunek_id = k.kierunek_id
+where k.kierunek_id = 1
+group by k.kierunek_id, k.nazwa
+
+--16
+select s.student_id, s.nazwisko, s.imie, count(*) from zaliczenia z
+inner join studenci s on z.student_id = s.student_id 
+where s.student_id = '0500324' and z.wynik like 'Z%'
+group by s.student_id
+
+--17
+select k.kierunek_id, count(z.kierunek_id), k.nazwa from zaliczenia z
+right join kierunki k on z.kierunek_id = k.kierunek_id
+group by k.kierunek_id
+
+--18
+select p.przedmiot_id, nazwa, count(distinct z.student_id) from zaliczenia z
+inner join przedmioty p on z.przedmiot_id = p.przedmiot_id
+group by p.przedmiot_id, nazwa
+
+--19
+select w.wykladowca_id, w.nazwisko, w.imie, count(wynik) from zaliczenia z
+right join wykladowcy w on z.wykladowca_id = w.wykladowca_Id
+group by w.wykladowca_Id
+
+--20
+select w.wykladowca_id, w.nazwisko, w.imie, count(wynik) from zaliczenia z
+right join wykladowcy w on z.wykladowca_id = w.wykladowca_Id
+group by w.wykladowca_Id 
+HAVing count(wynik) > 10
+
+--21
+select nazwa, z.kierunek_id, count(wynik) from zaliczenia z 
+right join kierunki k on z.kierunek_id = k.kierunek_id
+group by nazwa, z.kierunek_id
+having count(wynik) < 7
+
+--22
+select p.nazwa, p.przedmiot_id, count(distinct z.student_id) from zaliczenia z 
+right join przedmioty p on z.przedmiot_id = p.przedmiot_id
+group by p.nazwa, p.przedmiot_id
+having count(distinct z.student_id) > 5
+
+--23
+select s.student_id, imie, nazwisko, count(distinct kierunek_id) from zaliczenia z
+right join studenci s on z.student_id = s.student_id
+group by s.student_id
+
+--24
+select s.imie, s.nazwisko, s.student_id, sum(coalesce(ects, 0)) from zaliczenia z 
+right join studenci s on z.student_id = s.student_id
+left join przedmioty p on z.przedmiot_id = p.przedmiot_id
+group by s.imie, s.nazwisko, s.student_id
+
+--25
+------------------wykladwowcy----------------
+SELECT k.kierunek_id, nazwa, s_ects, x.uzyskaneECTS FROM kierunki k 
+LEFT JOIN 
+(SELECT student_id, kierunek_id, SUM(ects) uzyskaneECTS FROM zaliczenia z
+INNER JOIN przedmioty p ON z.przedmiot_id = p.przedmiot_id 
+AND wynik like 'Z%' 
+GROUP BY student_id, kierunek_id) x 
+ON x.kierunek_id = k.kierunek_id
+AND x.uzyskaneECTS >=  k.s_ects 
+
+-------------------moje(zle chyba)--------------------
+select student_id, sum(ects) PKT, k.nazwa, s_ects from zaliczenia z
+inner join przedmioty p on z.przedmiot_id = p.przedmiot_id
+inner join kierunki k on z.kierunek_id = k.kierunek_id
+where wynik like 'Z%' 
+group by student_id, wynik, s_ects, k.nazwa
+having sum(ects)> s_ects
+
+--26
+SELECT K.kierunek_id, nazwa, s_ects, AVG(X.uzysk_ECTS) Śr, MAX(X.uzysk_ects)
+FROM kierunki K 
+LEFT JOIN  
+	(SELECT student_id, kierunek_id, SUM(ECTS) Uzysk_ECTS
+	FROM zaliczenia Z INNER JOIN przedmioty P ON Z.przedmiot_id=P.przedmiot_id
+	AND wynik LIKE 'Z%' AND TO_CHAR(data_zal, 'YYYY')='2019'
+	GROUP BY student_id, kierunek_id) X
+ON X.kierunek_id=K.kierunek_id
+GROUP BY K.kierunek_id, nazwa, s_ects
+
+
+--27
+select k.kierunek_id, k.nazwa, min(data_zal), max(data_zal) from zaliczenia z
+inner join kierunki k on z.kierunek_id =  k.kierunek_id 
+where k.nazwa like 'Gry%'
+group by k.kierunek_id, k.nazwa
+
+--28
+select count(wynik), TO_CHAR( data_zal, 'yyyy-month') from zaliczenia
+group by  to_char(data_zal, 'yyyy-month')
+having count(wynik) = (select max(wyniki_count) from 
+					   (select count(wynik) wyniki_count 
+						FROM zaliczenia 
+						GROUP BY TO_CHAR(data_zal, 'yyyy-month')));
+
+
+--29
+select w.wykladowca_id, w.imie, w.nazwisko, p.nazwa, count(wynik) from zaliczenia z
+inner join wykladowcy w on z.wykladowca_id = w.wykladowca_id
+inner join przedmioty p on z.przedmiot_id = p.przedmiot_Id
+where p.przedmiot_id = 2
+group by w.wykladowca_Id, p.nazwa
+having count(wynik) = (select max(xd) from
+					  (select wykladowca_id, p.przedmiot_id, count(wynik) xd from zaliczenia z
+					  inner join przedmioty p on z.przedmiot_Id = p.przedmiot_id
+					  group by wykladowca_Id, p.przedmiot_id))
+
+--29
+select w.wykladowca_id, w.nazwisko, w.imie, p.przedmiot_id, p.nazwa, COUNT(*) LZ
+	FROM wykladowcy W INNER JOIN zaliczenia Z ON z.wykladowca_id = w.wykladowca_id
+		INNER JOIN przedmioty P ON p.przedmiot_id = z.przedmiot_id
+			GROUP BY w.wykladowca_id, w.nazwisko, w.imie, p.przedmiot_id, p.nazwa
+			HAVING COUNT(*) = (SELECT MAX(LZ) FROM
+				(SELECT wykladowca_id, przedmiot_id, COUNT(*) LZ FROM zaliczenia 
+				WHERE przedmiot_id = p.przedmiot_id
+				GROUP BY wykladowca_id, przedmiot_id ) X 
+			GROUP BY p.przedmiot_id)
+
+--30
+select s.nazwisko, s.imie, k.nazwa, min(data_zal), max(data_zal) from zaliczenia z
+right join studenci s on z.student_Id = s.student_id
+left join kierunki k on z.kierunek_id = k.kierunek_id
+group by s.nazwisko, s.imie, k.nazwa
+
+--30--
+SELECT y.*, s.nazwisko, s.imie, k.nazwa FROM 
+(SELECT z.kierunek_id, z.student_id, x.MD from zaliczenia Z
+INNER JOIN (select kierunek_id, MIN(data_zal) MD 
+			from zaliczenia GROUP BY kierunek_id ) X
+ON z.kierunek_id = x.kierunek_id AND Z.data_zal = X.MD ) Y 
+RIGHT JOIN kierunki k ON y.kierunek_id = k.kierunek_id
+RIGHT JOIN studenci S on Y.student_id = s.student_id
+
+--32--
+select distinct s.imie, s.nazwisko, wynik from zaliczenia z
+right join studenci s on z.student_id = s.student_id
+where wynik like 'N%'
+
+--33
+with y as 
+(select s.student_id, nazwisko, imie, lnz from studenci s inner join
+(select student_id, count(*) lnz from zaliczenia 
+	where wynik like 'N%'
+	group by student_id
+	having count(*) = (select max(lnz) from (
+	select student_id, count(*) lnz from zaliczenia 
+	where wynik like 'N%'
+	group by student_id) v )) x
+on s.student_id = x.student_id)
+
+select * from y where lnz = (select max(lnz) from y)
+
+----------------------------
+with y as 
+(select s.student_id, nazwisko, imie, lnz from studenci s inner join
+(select student_id, count(*) lnz from zaliczenia 
+	where wynik like 'N%'
+	group by student_id) x
+on s.student_id = x.student_id)
+
+select * from y where lnz = (select max(lnz) from y)
+
+
+--34
+with y as 
+(select p.przedmiot_id, nazwa, lnz from przedmioty p inner join
+(select przedmiot_id, count(*) lnz from zaliczenia 
+	where wynik like 'N%'
+	group by przedmiot_id
+	having count(*) = (select max(lnz) from (
+	select przedmiot_id, count(*) lnz from zaliczenia 
+	where wynik like 'N%'
+	group by przedmiot_id) v )) x
+on p.przedmiot_id = x.przedmiot_id)
+
+select * from y where lnz = (select max(lnz) from y)
+
+----------------------------
+with y as 
+(select p.przedmiot_id, nazwa, lnz from przedmioty p inner join
+(select przedmiot_id, count(*) lnz from zaliczenia 
+	where wynik like 'N%'
+	group by przedmiot_id) x
+on p.przedmiot_id = x.przedmiot_id)
+
+select * from y where lnz = (select max(lnz) from y)
+
+
+--------------------------PERSPEKTYWY-----------------
+--tworzenie widoku
+create view studenci_secure as 
+select student_id, nazwisko, imie, miasto, ulica, numer, kod from studenci
+
+--nadawanie uprawnien dla uzytkownika dla podnagego widoku
+grant select on student_secure TO login_uzytkownika
+
+--1
+create view studenci_secure as 
+select student_id, nazwisko, imie, miasto, ulica, numer, kod from studenci
+
+--2
+select * from studenci_secure where miasto = 'Rzeszów'
+
+--3
+create view studenci_ects as
+select s.student_id, nazwisko, imie, k.kierunek_id, k.nazwa, sum(ects) suma 
+from studenci s, przedmioty p, kierunki k, zaliczenia z
+where s.student_id = z.student_id and p.przedmiot_Id = z.przedmiot_id 
+and k.kierunek_id = z.kierunek_id and z.wynik like 'Z%'
+group by s.student_id, nazwisko, imie, k.kierunek_id, k.nazwa
+
+--4
+select * from studenci_ects where suma >= 70
+
+--5
+create view wykladowcy_wyniki_zal as
+select w.wykladowca_id, nazwisko, imie, p.przedmiot_id, nazwa, count(wynik) lzo,
+count(case wynik when 'Zaliczony' THEN wynik END) lzp,
+count(case when wynik like 'N%' THEN wynik END) lzn
+from zaliczenia z, wykladowcy w, przedmioty p
+where z.wykladowca_id = w.wykladowca_id and z.przedmiot_id = p.przedmiot_id
+group by w.wykladowca_id, nazwisko, imie, p.przedmiot_id, nazwa
+
+--6
+select wykladowca_id, nazwisko, imie, przedmiot_id, nazwa, lzn/lzo
+from wykladowcy_wyniki_zal
+
+select sum(lzn)/sum(lzo) from  wykladowcy_wyniki_zal
+
+--7
+drop view wykladowcy_wyniki_zal
+
+
+---------------KOLOS Z RODOS-----------------------
+--1
+select p.przedmiot_id, p.nazwa, min(data_zal) from zaliczenia z
+inner join przedmioty p on z.przedmiot_id = p.przedmiot_Id
+where p.nazwa like 'Bazy danych'
+group by p.przedmiot_id, p.nazwa
+
+--2
+select  count(s.student_id) from studenci s where s.student_id not in(
+select distinct s.student_id from zaliczenia z
+right join studenci s on z.student_id = s.student_id
+where z.kierunek_id = 3)
+
+--3
+select s.student_id,  s.nazwisko, s.imie, count(wynik) from zaliczenia z
+right join studenci s on z.student_id = s.student_id
+group by s.student_id, s.nazwisko, s.imie
+having count(wynik) > 7
+
+--4
+select count(case when miasto = 'Rzeszów' THEN wynik END) RZ, 
+count(case when miasto != 'Rzeszów' THEN wynik END) OTHER 
+from zaliczenia z
+right join studenci s on z.student_id = s.student_id
+inner join kierunki k on z.kierunek_id = k.kierunek_id
+where k.nazwa like 'Informatyka techniczna'
+
+--5
+SELECT y.*, s.nazwisko, s.imie, w.nazwisko as nazwisko_wyklad FROM 
+(SELECT z.wykladowca_id, z.student_id, x.MD from zaliczenia Z
+INNER JOIN (select wykladowca_id, MIN(data_zal) MD 
+			from zaliczenia GROUP BY wykladowca_id ) X
+ON z.wykladowca_id = x.wykladowca_id AND Z.data_zal = X.MD ) Y 
+RIGHT JOIN wykladowcy w ON y.wykladowca_id = w.wykladowca_id
+RIGHT JOIN studenci S on Y.student_id = s.student_id
+
